@@ -10,7 +10,13 @@ const app = express();
 dotenv.config()
 
 // middleware
-app.use(cors())
+const corsOptions = {
+    origin: '*', // Replace with your frontend URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11) choke on 204
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // connect mongoose

@@ -31,35 +31,35 @@ import {
     removeUserFromMyInterest
 
 } from '../controllers/userController.js';
-import { authenticateToken } from '../util/authentication.js';
+import { adminAuthenticate, authenticateToken } from '../util/authentication.js';
 
 router.get("/", getAllUsers);
-router.get("/:userID", getUser);
-router.delete("/:userID", authenticateToken, deleteUser);
-router.patch("/:userID/basic-information", authenticateToken, updateBasicInformation);
-router.patch("/:userID/partner-expectation", authenticateToken, updatePartnerExpectation);
-router.patch("/:userID/family-information", authenticateToken, updateFamilyInformation);
-router.patch("/:userID/physical-attributes", authenticateToken, updatePhysicalAttributes);
-router.patch("/:userID/address", authenticateToken, updateAddress);
-router.post("/:userID/education", authenticateToken, addEducation);
-router.patch("/:userID/education/:educationID", authenticateToken, updateEducation);
-router.delete("/:userID/education/:educationID", authenticateToken, deleteEducation);
-router.patch("/:userID/hobbies", authenticateToken, updateHobbies);
-router.patch("/:userID/languages", authenticateToken, updateLanguages);
-router.post("/:userID/career", authenticateToken, addCareer);
-router.patch("/:userID/career/:careerID", authenticateToken, updateCareer);
-router.delete("/:userID/career/:careerID", authenticateToken, deleteCareer);
-router.patch("/:userID/lifestyle", authenticateToken, updateLifestyle);
-router.patch("/:userID/personal-attitude", authenticateToken, updatePersonalAttitude);
-router.patch("/:userID/spiritual-social-bg", authenticateToken, updateSpiritualSocialBg);
-router.get("/:userID/shortlist", authenticateToken, getShortlistedUsers);
-router.patch("/:userID/shortlist", authenticateToken, shortlistUser);
-router.patch("/:userID/remove-from-shortlist", authenticateToken, removeUserFromShortlist);
-router.get("/:userID/interest", authenticateToken, getMyInterestUsers);
-router.patch("/:userID/interest", authenticateToken, addInterestedUser);
-router.patch("/:userID/remove-from-interest", authenticateToken, removeUserFromMyInterest);
+router.get("/", getUser);
+router.delete("/", authenticateToken, deleteUser);
+router.patch("/basic-information", authenticateToken, updateBasicInformation);
+router.patch("/partner-expectation", authenticateToken, updatePartnerExpectation);
+router.patch("/family-information", authenticateToken, updateFamilyInformation);
+router.patch("/physical-attributes", authenticateToken, updatePhysicalAttributes);
+router.patch("/address", authenticateToken, updateAddress);
+router.post("/education", authenticateToken, addEducation);
+router.patch("/education/:educationID", authenticateToken, updateEducation);
+router.delete("/education/:educationID", authenticateToken, deleteEducation);
+router.patch("/hobbies", authenticateToken, updateHobbies);
+router.patch("/languages", authenticateToken, updateLanguages);
+router.post("/career", authenticateToken, addCareer);
+router.patch("/career/:careerID", authenticateToken, updateCareer);
+router.delete("/career/:careerID", authenticateToken, deleteCareer);
+router.patch("/lifestyle", authenticateToken, updateLifestyle);
+router.patch("/personal-attitude", authenticateToken, updatePersonalAttitude);
+router.patch("/spiritual-social-bg", authenticateToken, updateSpiritualSocialBg);
+router.get("/shortlist", authenticateToken, getShortlistedUsers);
+router.patch("/shortlist", authenticateToken, shortlistUser);
+router.patch("/remove-from-shortlist", authenticateToken, removeUserFromShortlist);
+router.get("/interest", authenticateToken, getMyInterestUsers);
+router.patch("/interest", authenticateToken, addInterestedUser);
+router.patch("/remove-from-interest", authenticateToken, removeUserFromMyInterest);
 // this will be done by admin
-router.patch("/:userID/account-type", authenticateToken, updateAccountType);
+router.patch("/account-type", adminAuthenticate, updateAccountType);
 
 
 

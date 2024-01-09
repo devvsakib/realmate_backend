@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema({
         postalCode: String,
         city: String,
     },
+    addressesAreSame: Boolean,
     // done
     education: [
         {

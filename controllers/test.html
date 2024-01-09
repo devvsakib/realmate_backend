@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Address Form</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+
+</head>
+
+<body>
+
+    <h1>Update Address</h1>
+    <!-- HTML code for address input fields -->
+    <input type="text" id="cityInput" placeholder="Enter City">
+    <input type="text" id="stateInput" placeholder="Enter State">
+    <!-- Add other input fields for additional address details if needed -->
+    <!-- HTML code for address dropdowns -->
+    <!-- HTML code for address dropdowns -->
+    <select id="countryDropdown" >
+        <option value="" selected disabled>Select Country</option>
+        <!-- Populate this dropdown with countries -->
+    </select>
+
+    <select id="stateDropdown" onchange="fetchCities()">
+        <option value="" selected disabled>Select State</option>
+        <!-- Options for states will be populated dynamically -->
+    </select>
+
+    <select id="cityDropdown">
+        <option value="" selected disabled>Select City</option>
+        <!-- Options for cities will be populated dynamically -->
+    </select>
+
+
+    <!-- <form id="addressForm" style="display: flex; gap: 2rem;">
+        <div>
+
+            <label for="presentAddress">Present Address:</label><br>
+            <input type="text" id="presentCountry" placeholder="Country"><br>
+            <input type="text" id="presentState" placeholder="State"><br>
+            <input type="text" id="presentPostalCode" placeholder="Postal Code"><br>
+            <input type="text" id="presentCity" placeholder="City"><br><br>
+        </div>
+        <div>
+
+            <label for="permanentAddress">Permanent Address:</label><br>
+            <input type="text" id="permanentCountry" placeholder="Country"><br>
+            <input type="text" id="permanentState" placeholder="State"><br>
+            <input type="text" id="permanentPostalCode" placeholder="Postal Code"><br>
+            <input type="text" id="permanentCity" placeholder="City"><br><br>
+        </div>
+        <div>
+            <input type="checkbox" id="addressesAreSame" onchange="toggleAddresses()">
+            <label for="addressesAreSame">Both addresses are the same</label><br><br>
+
+            <button type="submit">Submit</button>
+        </div>
+    </form> -->
+    <script>
+       async function fetchCityStateDetails() {
+            const cityInput = "sylhet";
+            const stateInput = document.getElementById('stateInput').value;
+
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?state=${cityInput}&format=json`);
+                const data = await response.json();
+                console.log(data.map((item) => item.display_name))  
+                if(data) {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?city=moulovibazar&format=json`);
+                    const data = await response.json();
+                    if(data) {
+                        console.log(data.map((item) => item.display_name))  
+                    }
+                }
+                // if (data.length > 0) {
+                //     const city = data[0].display_name; // Get the city name from the API response
+                //     const state = data[0].address.state; // Get the state name from the API response
+
+                //     // Update city and state input fields with fetched values
+                //     document.getElementById('cityInput').value = city;
+                //     document.getElementById('stateInput').value = state;
+
+                //     // Optionally, log or use the retrieved city and state values
+                //     console.log("City:", city);
+                //     console.log("State:", state);
+                // } else {
+                //     console.log('City and state not found');
+                //     // Handle case where city and state are not found or display an error message
+                // }
+            } catch (error) {
+                console.error('Error fetching city and state details:', error);
+                // Handle any errors that occur during the fetch request
+            }
+        }
+
+        // Call the fetchCityStateDetails function when the input value changes (for example, on blur or after a certain timeout)
+        document.getElementById('countryDropdown').addEventListener('change', fetchCityStateDetails);
+
+        // The fetchCities() function remains unchanged to fetch and populate cities based on selected state and country
+
+
+        // The fetchCities() function remains the same for fetching and populating cities based on selected state and country
+
+
+        async function fetchCities() {
+            const country = document.getElementById('countryDropdown').value;
+            const state = document.getElementById('stateDropdown').value;
+            const cityDropdown = document.getElementById('cityDropdown');
+
+            // Clear previous options in city dropdown
+            cityDropdown.innerHTML = '<option value="" selected disabled>Select City</option>';
+
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search.php?q=${state},${country}&format=json&polygon=0&addressdetails=1&limit=10`);
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.display_name;
+                        option.textContent = city.display_name;
+                        cityDropdown.appendChild(option);
+                    });
+                } else {
+                    console.log('Cities not found for the selected state');
+                }
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+            }
+        }
+
+        // Call the fetchCountries function to populate the country dropdown initially (not shown, as it remains unchanged)
+    </script>
+
+    <script>
+        // Fetch list of countries using REST Countries API
+        async function fetchCountries() {
+            try {
+                const response = await fetch('https://restcountries.com/v3.1/all');
+                const countries = await response.json();
+
+                const countryDropdown = document.getElementById('countryDropdown');
+
+                countries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.name.common;
+                    option.textContent = country.name.common;
+                    countryDropdown.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching countries:', error);
+            }
+        }
+
+        fetchCountries(); // Call the function to populate the country dropdown on page load
+    </script>
+
+    <!-- <script>
+        // Function to fetch city and state names based on user input
+        function fetchCityStateDetails() {
+            const cityInput = document.getElementById('cityInput').value;
+            const stateInput = document.getElementById('stateInput').value;
+
+            try {
+                const response = fetch(`https://nominatim.openstreetmap.org/search?city=${cityInput}&state=${stateInput}&format=json`);
+                const data = response.json();
+                console.log(data)
+                if (data.length > 0) {
+                    const city = data[0].display_name; // Get the city name from the API response
+                    const state = data[0].address.state; // Get the state name from the API response
+
+                    // Update city and state input fields with fetched values
+                    document.getElementById('cityInput').value = city;
+                    document.getElementById('stateInput').value = state;
+
+                    // Optionally, log or use the retrieved city and state values
+                    console.log("City:", city);
+                    console.log("State:", state);
+                } else {
+                    console.log('City and state not found');
+                    // Handle case where city and state are not found or display an error message
+                }
+            } catch (error) {
+                console.error('Error fetching city and state details:', error);
+                // Handle any errors that occur during the fetch request
+            }
+        }
+
+        // Call the fetchCityStateDetails function when the input value changes (for example, on blur or after a certain timeout)
+        document.getElementById('cityInput').addEventListener('change', fetchCityStateDetails);
+        document.getElementById('stateInput').addEventListener('change', fetchCityStateDetails);
+    </script>
+
+    <script defer>
+        // Function to fetch country details based on user input
+        async function fetchCountryDetails() {
+            const countryInput = document.getElementById('presentCountry').value;
+            console.log(countryInput)
+            try {
+                const response = await fetch(`https://restcountries.com/v3.1/name/${countryInput}`);
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    const countryDetails = data[0]; // Assuming the first result is the most relevant
+
+                    // Update other fields with country details
+                    document.getElementById('presentCountry').value = countryDetails.name.common;
+                    // Update other fields (state, city, postal code) if needed using countryDetails object
+
+                    // Optionally, you can log the entire countryDetails object for more information
+                    console.log(countryDetails);
+                } else {
+                    console.log('Country not found');
+                    // Handle case where country is not found or display an error message
+                }
+            } catch (error) {
+                console.error('Error fetching country details:', error);
+                // Handle any errors that occur during the fetch request
+            }
+        }
+
+        // Call the fetchCountryDetails function when the input value changes (for example, on blur or after a certain timeout)
+        document.getElementById('presentCountry').addEventListener('change', fetchCountryDetails);
+
+        function toggleAddresses() {
+            const addressesAreSameCheckbox = document.getElementById("addressesAreSame");
+            const permanentAddressFields = document.querySelectorAll('[id^="permanent"]');
+
+            permanentAddressFields.forEach(field => {
+                field.disabled = addressesAreSameCheckbox.checked;
+            });
+        }
+
+        document.getElementById("addressForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const presentAddress = {
+                country: document.getElementById("presentCountry").value,
+                state: document.getElementById("presentState").value,
+                postalCode: document.getElementById("presentPostalCode").value,
+                city: document.getElementById("presentCity").value
+            };
+
+            let updatedAddress;
+            if (document.getElementById("addressesAreSame").checked) {
+                updatedAddress = presentAddress; // If both addresses are the same
+            } else {
+                updatedAddress = {
+                    country: document.getElementById("permanentCountry").value,
+                    state: document.getElementById("permanentState").value,
+                    postalCode: document.getElementById("permanentPostalCode").value,
+                    city: document.getElementById("permanentCity").value
+                };
+            }
+
+            const addressesAreSame = document.getElementById("addressesAreSame").checked;
+
+            // Make a fetch request to the backend with the form data
+            const userID = '298767'; // Replace with actual user ID
+            const response = await fetch(`http://localhost:5000/api/users/${userID}/address`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    addressType: 'permanentAddress',
+                    updatedAddress,
+                    addressesAreSame
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log("Address updated successfully:", result);
+                // Optionally, update the UI to reflect the changes
+            } else {
+                console.error("Failed to update address");
+            }
+        });
+    </script> -->
+
+</body>
+
+</html>

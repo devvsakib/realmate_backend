@@ -2,7 +2,8 @@ import User from "../models/User.js";
 import responseMessage from "../util/responseMessage.js";
 
 // Get all users
-export const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
+    if(req.headers.userid) return next()
     try {
         const users = await User.find();
         res.status(200).json(users);
@@ -15,7 +16,7 @@ export const getAllUsers = async (req, res) => {
 // Get a single user by userID
 export const getUser = async (req, res) => {
     try {
-        const user = await User.findOne({ userID: req.params.userID }).select("-password");
+        const user = await User.findOne({ userID: req.headers.userid }).select("-password");
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -31,8 +32,8 @@ export const getUser = async (req, res) => {
 // Delete a user by userID
 export const deleteUser = async (req, res) => {
     try {
-        console.log(req.params.userID)
-        const user = await User.findOneAndDelete({ userID: req.params.userID });
+        console.log(req.headers.userid)
+        const user = await User.findOneAndDelete({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -51,7 +52,7 @@ export const updateBasicInformation = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -75,7 +76,7 @@ export const updatePartnerExpectation = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -99,7 +100,7 @@ export const updateFamilyInformation = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -123,7 +124,7 @@ export const updatePhysicalAttributes = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -142,20 +143,31 @@ export const updatePhysicalAttributes = async (req, res) => {
 export const updateAddress = async (req, res) => {
     try {
         const { userID } = req.params;
-        const { addressType, updatedAddress } = req.body;
+        const { addressType, updatedAddress, addressesAreSame } = req.body;
 
         if (!addressType || !updatedAddress) {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: userID });
+        const user = await User.findOne({ userID });
 
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
-        if (addressType === "presentAddress") user.presentAddress = updatedAddress;
-        else user.permanentAddress = updatedAddress;
 
+        if (addressesAreSame) {
+            user.presentAddress = { ...updatedAddress };
+            user.permanentAddress = { ...updatedAddress };
+            user.addressesAreSame = true;
+        } else {
+            if (addressType === "presentAddress") {
+                user.presentAddress = { ...updatedAddress };
+            } else {
+                user.permanentAddress = { ...updatedAddress };
+            }
+            user.addressesAreSame = false;
+        }
+        
         await user.save();
         res.status(200).json(user[addressType]);
 
@@ -163,6 +175,7 @@ export const updateAddress = async (req, res) => {
         res.status(500).json(responseMessage("Internal server error"));
     }
 };
+
 
 // Add education information
 export const addEducation = async (req, res) => {
@@ -173,7 +186,7 @@ export const addEducation = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -197,7 +210,7 @@ export const updateEducation = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -232,7 +245,7 @@ export const deleteEducation = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
 
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
@@ -265,7 +278,7 @@ export const updateHobbies = async (req, res) => {
     try {
         const { hobbies, interests, music, books, movies, tvShows, sports, fitnessActivities, cuisines, dressStyles } = req.body;
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -301,7 +314,7 @@ export const updateLanguages = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -321,7 +334,7 @@ export const addCareer = async (req, res) => {
     try {
         const { designation, company, start, end, status } = req.body;
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -355,7 +368,7 @@ export const updateCareer = async (req, res) => {
     try {
         const { designation, company, start, end, status } = req.body;
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         const { careerID } = req.params;
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
@@ -398,7 +411,7 @@ export const deleteCareer = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
 
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
@@ -432,7 +445,7 @@ export const updateLifestyle = async (req, res) => {
         if (!diet || !drink || !smoke || !livingWith) {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -458,7 +471,7 @@ export const updatePersonalAttitude = async (req, res) => {
         if (!politicalViews || !religiousService) {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -479,7 +492,7 @@ export const updatePersonalAttitude = async (req, res) => {
 export const updateSpiritualSocialBg = async (req, res) => {
     try {
         const { religion, caste, ethnicity } = req.body;
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -536,7 +549,7 @@ export const removeUserFromShortlist = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
 
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
@@ -566,7 +579,7 @@ export const removeUserFromShortlist = async (req, res) => {
 // Get shortlisted users
 export const getShortlistedUsers = async (req, res) => {
     try {
-        const user = await User.findOne({ userID: req.params.userID }).select("shortlist");
+        const user = await User.findOne({ userID: req.headers.userid }).select("shortlist");
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -619,7 +632,7 @@ export const removeUserFromMyInterest = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
 
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
@@ -649,7 +662,7 @@ export const removeUserFromMyInterest = async (req, res) => {
 // Get myInterest users
 export const getMyInterestUsers = async (req, res) => {
     try {
-        const user = await User.findOne({ userID: req.params.userID }).select("myInterest");
+        const user = await User.findOne({ userID: req.headers.userid }).select("myInterest");
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
         }
@@ -672,7 +685,7 @@ export const updateAccountType = async (req, res) => {
             return res.status(400).json(responseMessage("Missing required fields!"));
         }
 
-        const user = await User.findOne({ userID: req.params.userID });
+        const user = await User.findOne({ userID: req.headers.userid });
 
         if (!user) {
             return res.status(404).json(responseMessage("User not found"));
