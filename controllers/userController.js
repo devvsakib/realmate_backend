@@ -3,9 +3,11 @@ import responseMessage from "../util/responseMessage.js";
 
 // Get all users
 export const getAllUsers = async (req, res, next) => {
-    if(req.headers.userid) return next()
+    if (req.headers.userid) return next()
     try {
-        const users = await User.find();
+        const users = await User.find().select(
+            "-password -_id"
+        );
         res.status(200).json(users);
     } catch (error) {
         console.error(error);
@@ -167,7 +169,7 @@ export const updateAddress = async (req, res) => {
             }
             user.addressesAreSame = false;
         }
-        
+
         await user.save();
         res.status(200).json(user[addressType]);
 
@@ -699,5 +701,104 @@ export const updateAccountType = async (req, res) => {
 
     } catch (error) {
         res.status(500).json(responseMessage("Internal server error"));
+    }
+};
+
+// advance search filter
+export const advanceSearch = async (req, res) => {
+    try {
+        const { type, maritalStatus, age, height, memberID, cast, subCast, profession, address, motherTongue, complexion, education } = req.body;
+        const user = await User.find({
+            $and: [
+                { "basicInformation.type": type },
+                { "basicInformation.maritalStatus": maritalStatus },
+                { "basicInformation.age": age },
+                { "basicInformation.height": height },
+                { "basicInformation.memberID": memberID },
+                { "basicInformation.cast": cast },
+                { "basicInformation.subCast": subCast },
+                { "basicInformation.profession": profession },
+                { "basicInformation.address": address },
+                { "basicInformation.motherTongue": motherTongue },
+                { "basicInformation.complexion": complexion },
+                { "basicInformation.education": education }
+            ]
+        });
+        if (!user) {
+            return res.status(404).json(responseMessage("User not found"));
+        }
+        res.status(200).json(user);
+
+    } catch (error) {
+        res.status(500).json(responseMessage("Internal server error"));
+    }
+};
+
+export const getUsersByCriteria = async (req, res) => {
+    try {
+        // Extract search criteria from the request body
+        const {
+            type,
+            maritalStatus,
+            age,
+            height,
+            memberID,
+            cast,
+            subCast,
+            profession,
+            address,
+            motherTongue,
+            complexion,
+            education
+        } = req.body;
+
+        // Construct the filter object based on provided criteria
+        const filter = {};
+
+        if (type) filter.type = type;
+        if (maritalStatus) filter.maritalStatus = maritalStatus;
+        if (age) filter.age = { $gte: age.min, $lte: age.max };
+        if (height) filter.height = { $gte: height.min, $lte: height.max };
+        if (memberID) filter.memberID = memberID;
+        if (cast) filter.cast = cast;
+        if (subCast) filter.subCast = subCast;
+        if (profession) filter.profession = profession;
+
+        // if (address) {
+        //     if (address.city) filter["address.city"] = address.city;
+        //     if (address.state) filter["address.state"] = address.state;
+        //     if (address.country) filter["address.country"] = address.country;
+        // }
+
+        if (address) {
+            const { city, state, country, addressesAreSame } = address;
+            if (addressesAreSame) {
+                filter.presentAddress = { city, state, country };
+                filter.permanentAddress = { city, state, country };
+            } else {
+                if (city) {
+                    filter.presentAddress.city = city,
+                    filter.permanentAddress.city = city;
+                }
+                if (state) {
+                    filter.presentAddress.state = state;
+                    filter.permanentAddress.state = state;
+                }
+                if (country) {
+                    filter.presentAddress.country = country;
+                    filter.permanentAddress.country = country;
+                }
+            }
+        }
+        if (motherTongue) filter.motherTongue = motherTongue;
+        if (complexion) filter.complexion = complexion;
+        if (education) filter.education = education;
+
+        // Find users based on the constructed filter
+        const users = await User.find(filter).select("basicInformation -_id");
+        return res.status(200).json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(responseMessage("Internal server error", error));
     }
 };

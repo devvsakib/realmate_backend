@@ -28,7 +28,8 @@ import {
     updateAccountType,
     getMyInterestUsers,
     addInterestedUser,
-    removeUserFromMyInterest
+    removeUserFromMyInterest,
+    getUsersByCriteria
 
 } from '../controllers/userController.js';
 import { adminAuthenticate, authenticateToken } from '../util/authentication.js';
@@ -60,6 +61,7 @@ router.patch("/interest", authenticateToken, addInterestedUser);
 router.patch("/remove-from-interest", authenticateToken, removeUserFromMyInterest);
 // this will be done by admin
 router.patch("/account-type", adminAuthenticate, updateAccountType);
+router.get("/search", getUsersByCriteria);
 
 
 
