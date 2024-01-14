@@ -7,6 +7,7 @@ import responseMessage from "../util/responseMessage.js";
 
 export const registerUser = async (req, res) => {
     const user = req.body;
+    console.log(user);
     if (!user.password || !user.basicInformation.email) return res.status(400).json({ error: "Missing required fields!" });
     try {
         // check email and phone number
@@ -18,13 +19,13 @@ export const registerUser = async (req, res) => {
             // Check if the email matches
             if (findUser.basicInformation.email == user.basicInformation.email) {
                 errorMessage += "this email already exists.";
-                return res.status(400).json({ error: errorMessage });
+                return res.status(400).json({ message: errorMessage });
             }
 
             // Check if the phone number matches
             if (findUser.basicInformation.phone == user.basicInformation.phone) {
                 errorMessage += "this phone number already exists.";
-                return res.status(400).json({ error: errorMessage });
+                return res.status(400).json({ message: errorMessage });
             }
 
         }
@@ -33,10 +34,24 @@ export const registerUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(user.password, 10)
 
-        const savedUser = await new User({ ...user, password: hashedPassword }).save();
+        const updateUser = {
+            ...user,
+            password: hashedPassword
+        }
+        const savedUser = await new User(updateUser).save();
         if (!savedUser) return res.status(400).json({ error: "User not Registered!" });
 
-        return res.status(201).json(responseMessage("User created successfully", savedUser));
+        const token = jwt.sign(
+            { userId: savedUser.userID, email: user.basicInformation.email },
+            savedUser.userID,
+            {
+                expiresIn: '1h',
+            }
+        );
+        delete savedUser.toJSON().password;
+        return res.status(201).json(responseMessage("User created successfully",
+            { ...savedUser.toJSON(), token }
+        ));
     } catch (error) {
         if (error.name === 'MongoError' && error.code === 11000) {
             // MongoDB dup key error (code 11000)
@@ -51,16 +66,17 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
     const { email, password, phone } = req.body;
-
     try {
         // Find user by email or phone number
-        const user = await User.findOne({ $or: [{ "basicInformation.email": email }, { "basicInformation.phone": phone }] });
+        const user = await User.findOne({
+            $or: [{ "basicInformation.email": email }, { "basicInformation.phone": phone }],
+        });
 
-        // check if user does not exists
+        // check if user does not exist
         if (!user) {
             if (email) {
                 return res.status(404).json(responseMessage('User with this email does not exist.'));
-            } else if (phone) {
+            } else {
                 return res.status(404).json(responseMessage('User with this phone number does not exist.'));
             }
         }
@@ -73,18 +89,27 @@ export const loginUser = async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user.userID, email: user.basicInformation.email }, user.userID, {
-            expiresIn: '1h',
-        });
+        const token = jwt.sign(
+            { userId: user.userID, email: user.basicInformation.email },
+            user.userID,
+            {
+                expiresIn: '1h',
+            }
+        );
 
-        // Return the token
-        res.status(200).json(responseMessage('Login successful', { token }));
+        // Use toJSON to remove the password field from the response
+        const updateUser = user.toJSON();
+        delete updateUser.password;
 
+        if (updateUser) {
+            res.status(200).json(responseMessage('Login successful', { token, user: updateUser }));
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json(responseMessage('Internal server error'));
     }
 };
+
 
 export const logoutUser = async (req, res) => {
     const token = req.headers.authorization;

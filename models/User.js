@@ -1,10 +1,18 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    type: {
-        type: String,
-        required: true
+    // done
+    isPremium: {
+        type: Boolean,
+        default: false
     },
+    // done
+    account_status: {
+        type: String,
+        required: true,
+        default: 'pending'
+    },
+    // done
     userID: {
         type: String,
         required: true,
@@ -15,12 +23,13 @@ const userSchema = new mongoose.Schema({
         firstName: String,
         lastName: String,
         gender: String,
-        dob: Date,
+        dob: String,
         createProfileFor: String,
         numberOfChildren: Number,
         photo: String,
         introduction: String,
         firstLanguage: String,
+        maritalStatus: String,
         email: {
             type: String,
             required: true
@@ -39,15 +48,17 @@ const userSchema = new mongoose.Schema({
     permanentAddress: {
         sameAsPresentAddress: Boolean,
         country: String,
-        state: String,
-        postalCode: String,
-        city: String,
+        division: String,
+        district: String,
+        upazila: String,
+        union: String,
     },
     presentAddress: {
         country: String,
-        state: String,
-        postalCode: String,
-        city: String,
+        division: String,
+        district: String,
+        upazila: String,
+        union: String,
     },
     addressesAreSame: Boolean,
     // done
@@ -156,11 +167,6 @@ const userSchema = new mongoose.Schema({
     interestedMembers: {
         type: Array,
         default: []
-    },
-    // done
-    isPremium: {
-        type: Boolean,
-        default: false
     },
     // done
     password: {

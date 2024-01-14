@@ -1,0 +1,142 @@
+{
+    "basicInformation": {
+        "firstName": "Sakib",
+        "lastName": "Ahmed",
+        "gender": "Male",
+        "dob": "1990-01-01T00:00:00.000Z",
+        "createProfileFor": "Self ",
+        "numberOfChildren": null,
+        "photo": "https://example.com/photo.jpg",
+        "introduction": "I am a friendly and outgoing person. I love backend development.",
+        "firstLanguage": "English",
+        "email": "john.doe@example.com",
+        "phone": 1234567891,
+        "maritalStatus": "Single",
+        "religion": "Islam",
+        "caste": "Sunni"
+    },
+    "permanentAddress": {
+        "country": "sdfsdfds",
+        "state": "fadsf",
+        "postalCode": "sdfdsf",
+        "city": "sdf"
+    },
+    "presentAddress": {
+        "country": "sdfsdfds",
+        "state": "fadsf",
+        "postalCode": "sdfdsf",
+        "city": "sdf"
+    },
+    "languages": {
+        "motherTongue": "Bangla",
+        "knownLanguages": [
+            "Spanish",
+            "French",
+            "German"
+        ]
+    },
+    "familyInformation": {
+        "father": true,
+        "mother": true,
+        "siblings": true
+    },
+    "hobbies": {
+        "hobbies": [
+            "Reading",
+            "Traveling"
+        ],
+        "interests": [
+            "Technology",
+            "Photography"
+        ],
+        "books": [
+            "Science Fiction",
+            "Mystery"
+        ],
+        "movies": [
+            "Action",
+            "Comedy"
+        ],
+        "tvShows": [
+            "Drama",
+            "Thriller"
+        ],
+        "sports": [
+            "Soccer",
+            "Tennis"
+        ],
+        "fitnessActivities": [
+            "Running",
+            "Yoga"
+        ],
+        "cuisines": [
+            "Italian",
+            "Japanese"
+        ],
+        "dressStyles": [
+            "Formal"
+        ],
+        "music": [
+            "No"
+        ]
+    },
+    "lifestyle": {
+        "diet": "no",
+        "drink": "no",
+        "livingWith": "parents",
+        "smoke": "no"
+    },
+    "personalAttitude": {
+        "politicalViews": "ampata",
+        "religiousService": "no"
+    },
+    "spiritualSocialBg": {
+        "caste": "Ahle Hadith",
+        "religion": "Islam",
+        "ethnicity": "Sunni"
+    },
+    "userID": "298767",
+    "shortlist": [],
+    "myInterest": [],
+    "interestedMembers": [],
+    "isPremium": false,
+    "createdAt": "2024-01-08T17:26:20.046Z",
+    "education": [
+        {
+            "degree": "Bachelor of Science in Computer Science",
+            "institution": "University of XYZ",
+            "start": "2018-09-01T00:00:00.000Z",
+            "end": "2022-05-31T00:00:00.000Z",
+            "status": "Completed",
+            "_id": "659c38f2f86ad3a4a662cf5c"
+        }
+    ],
+    "career": [
+        {
+            "designation": "Senior Software Engineer",
+            "company": "Tech Innovators",
+            "start": "2023-01-01T00:00:00.000Z",
+            "end": "2024-01-01T00:00:00.000Z",
+            "status": "Full-time",
+            "_id": "659c373a1a2e2b9aa05f6cc8"
+        },
+        {
+            "designation": "j Software Engineer",
+            "company": "Tech Innovators",
+            "start": "2023-01-01T00:00:00.000Z",
+            "end": "2024-01-01T00:00:00.000Z",
+            "status": "Full-time",
+            "_id": "659d423b0d0db625bc164ff5"
+        },
+        {
+            "designation": "j Software Engineer",
+            "company": "Tech Innovators",
+            "start": "2023-01-01T00:00:00.000Z",
+            "end": "2024-01-01T00:00:00.000Z",
+            "status": "Full-time",
+            "_id": "659d42410d0db625bc164ffb"
+        }
+    ],
+    "__v": 19,
+    "addressesAreSame": true
+}

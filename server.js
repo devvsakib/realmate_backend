@@ -10,13 +10,13 @@ const app = express();
 dotenv.config()
 
 // middleware
-const corsOptions = {
-    origin: '*', // Replace with your frontend URL
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    optionsSuccessStatus: 200 // Some legacy browsers (IE11) choke on 204
-};
+// const corsOptions = {
+//     origin: '*', // Replace with your frontend URL
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     optionsSuccessStatus: 200 // Some legacy browsers (IE11) choke on 204
+// };
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.json());
 
 // connect mongoose
@@ -24,14 +24,13 @@ const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }
-mongoose.connect(process.env.MONGO_URI, options)
+mongoose.connect("mongodb+srv://devvsakib:S9GOFECAPROgVxYM@cluster0.oqnwndl.mongodb.net/?retryWrites=true&w=majority", options)
     .then(() => {
         console.log('Connected to MongoDB');
     })
     .catch((err) => {
         console.log('Error connecting to MongoDB', err);
     });
-
 
 // Status
 app.get("/", (req, res) => res.status(200).json({
