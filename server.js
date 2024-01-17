@@ -24,7 +24,7 @@ const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }
-mongoose.connect("mongodb+srv://devvsakib:S9GOFECAPROgVxYM@cluster0.oqnwndl.mongodb.net/?retryWrites=true&w=majority", options)
+mongoose.connect(process.env.MONGO_URI, options)
     .then(() => {
         console.log('Connected to MongoDB');
     })
